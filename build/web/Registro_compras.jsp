@@ -38,14 +38,6 @@
             </div>
             <div class="modal-body">
                 <form action="sr_cCompras?menu=Nueva_compra" method="post">
-                    <!-- Información del Producto -->
-                    <div id="info_producto" class="mb-3" style="display: none;">
-                        <h6><b>Detalles del Producto:</b></h6>
-                        <p id="producto_nombre"></p>
-                        <p id="producto_precio"></p>
-                        <p id="producto_existencia"></p>
-                    </div>
-
                     <!-- ID de Compra -->
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -137,9 +129,8 @@
         </div>
     </div>
 </div>
-
-
-                <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+                                
+<div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
     <table class="table table-striped table-hover">
         <thead style="position: sticky; top: 0; background-color: white; z-index: 1;">
             <tr>
@@ -164,9 +155,9 @@
                     out.println("<td>" + tablaCompras.getValueAt(t, 4) + "</td>"); // Proveedor
                     out.println("<td>" + tablaCompras.getValueAt(t, 2) + "</td>"); // Fecha de Orden
                     out.println("<td>" + tablaCompras.getValueAt(t, 3) + "</td>"); // Fecha de Ingreso
-                    out.println("<td>" + tablaCompras.getValueAt(t, 7) + "</td>"); // producto
-                    out.println("<td>" + tablaCompras.getValueAt(t, 8) + "</td>"); // cantidad
-                    out.println("<td>" + tablaCompras.getValueAt(t, 9) + "</td>"); // precio_costo_unitario
+                    out.println("<td>" + tablaCompras.getValueAt(t, 7) + "</td>"); // Producto
+                    out.println("<td>" + tablaCompras.getValueAt(t, 8) + "</td>"); // Cantidad
+                    out.println("<td>" + tablaCompras.getValueAt(t, 9) + "</td>"); // Precio Unitario
                     
                     out.println("</tr>");
                 }

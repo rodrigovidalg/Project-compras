@@ -27,74 +27,95 @@ public class sr_cCompras extends HttpServlet {
 
         if ("Nueva_compra".equals(menu)) {
             handleNuevaCompra(request, response);
+        } else if ("Proveedores".equals(menu)) {
+            handleProveedores(request, response);
         } else {
             response.sendRedirect("Registro_compra.jsp");
         }
     }
 
 private void handleNuevaCompra(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-	String action = request.getParameter("action");
-	ComprasDAO comprasDAO = new ComprasDAO(); // Crear instancia de ComprasDAO
-	// Obtener los parámetros de compra
-	String idProveedorStr = request.getParameter("txt_id_proveedor");
-	String fechaOrden = request.getParameter("txt_fecha_orden");
-	String fechaIngreso = request.getParameter("txt_fecha_ingreso");
-	String idCompraStr = request.getParameter("txt_id_compra"); // ID de compra
-	// Validar que los campos requeridos no estén vacíos
-	if(idProveedorStr == null || idProveedorStr.isEmpty() || fechaOrden == null || fechaOrden.isEmpty() || fechaIngreso == null || fechaIngreso.isEmpty() || (action.equals("actualizar") && (idCompraStr == null || idCompraStr.isEmpty()))) { // Validar idCompraStr solo si se actualiza
-		request.getRequestDispatcher("Registro_compras.jsp").forward(request, response);
-		return;
-	}
-	int idProveedor;
-	int idCompra = -1; // Valor por defecto
-	try {
-		idProveedor = Integer.parseInt(idProveedorStr);
-		Compras nuevaCompra;
-		switch(action) {
-			case "agregar":
-				Compras comprasInstance = new Compras();
-				int nuevoNumeroOrdenCompra = comprasInstance.obtenerUltimoNum() + 1;
-				// Crear una nueva instancia de Compra
-				nuevaCompra = new Compras(nuevoNumeroOrdenCompra, nuevoNumeroOrdenCompra, idProveedor, fechaOrden, fechaIngreso);
-				// Aquí debes recoger los detalles (productos) que se van a agregar
-				List < DetalleCompra > detalles = obtenerDetallesDesdeFormulario(request); // Método para obtener detalles
-				// Agregar la compra y sus detalles
-				comprasDAO.agregarCompraYDetalles(nuevaCompra, detalles); // Llama al nuevo método
-				response.sendRedirect("Registro_compras.jsp");
-				break;
-			case "actualizar":
-				idCompra = Integer.parseInt(idCompraStr); // Obtener el ID de compra para actualizar
-				// Obtener la compra existente para obtener el no_orden_compra
-				Compras compraExistente = comprasDAO.obtenerCompraPorId(idCompra); // Asegúrate de que este método exista
-				if(compraExistente != null) {
-					// Crear una nueva instancia de Compra con los datos actualizados
-					nuevaCompra = new Compras(idCompra, compraExistente.getNo_orden_compra(), idProveedor, fechaOrden, fechaIngreso);
-					// Aquí debes recoger los detalles actualizados desde el formulario
-					List < DetalleCompra > detallesActualizados = obtenerDetallesDesdeFormulario(request); // Método para obtener detalles actualizados
-					// Actualizar la compra y sus detalles
-					comprasDAO.actualizarCompraYDetalles(nuevaCompra, detallesActualizados); // Llama al nuevo método
-					response.sendRedirect("Registro_compras.jsp");
-				} else {
-					response.getWriter().println("<h1>No se encontró la compra</h1>");
-					request.getRequestDispatcher("Registro_compras.jsp").forward(request, response);
-				}
-				break;
-			case "eliminar":
-				idCompra = Integer.parseInt(idCompraStr); // Obtener el ID de compra para eliminar
-				if(comprasDAO.eliminarCompraYDetalles(idCompra)) { // Llama al nuevo método
-					response.sendRedirect("Registro_compras.jsp");
-				} else {
-					response.getWriter().println("<h1>No se pudo eliminar la compra</h1>");
-					request.getRequestDispatcher("Registro_compras.jsp").forward(request, response);
-				}
-				break;
-			default:
-				response.sendRedirect("Registro_compras.jsp");
-				break;
-		}
-	} catch (NumberFormatException e) {
-		response.sendRedirect("Registro_compras.jsp");
-	}
+    String action = request.getParameter("action");
+    ComprasDAO comprasDAO = new ComprasDAO(); // Crear instancia de ComprasDAO
+    
+    // Obtener los parámetros de compra
+    String idProveedorStr = request.getParameter("txt_id_proveedor");
+    String fechaOrden = request.getParameter("txt_fecha_orden");
+    String fechaIngreso = request.getParameter("txt_fecha_ingreso");
+    String idCompraStr = request.getParameter("txt_id_compra"); // ID de compra
+
+    // Validar que los campos requeridos no estén vacíos
+    if (idProveedorStr == null || idProveedorStr.isEmpty() || 
+        fechaOrden == null || fechaOrden.isEmpty() || 
+        fechaIngreso == null || fechaIngreso.isEmpty() || 
+        (action.equals("actualizar") && (idCompraStr == null || idCompraStr.isEmpty()))) {
+        
+        request.getRequestDispatcher("Registro_compras.jsp").forward(request, response);
+        return;
+    }
+
+    int idProveedor;
+    int idCompra = -1; // Declaramos idCompra aquí para evitar el error
+    
+    try {
+        idProveedor = Integer.parseInt(idProveedorStr);
+        
+        Compras nuevaCompra;
+        
+        switch (action) {
+            case "agregar":
+                Compras comprasInstance = new Compras();
+                int nuevoNumeroOrdenCompra = comprasInstance.obtenerUltimoNum() + 1;
+
+                // Crear una nueva instancia de Compra
+                nuevaCompra = new Compras(nuevoNumeroOrdenCompra, nuevoNumeroOrdenCompra, idProveedor, fechaOrden, fechaIngreso);
+                
+                // Aquí debes recoger los detalles (productos) que se van a agregar
+                List<DetalleCompra> detalles = obtenerDetallesDesdeFormulario(request); // Método para obtener detalles
+                
+                // Agregar la compra y sus detalles
+                comprasDAO.agregarCompraYDetalles(nuevaCompra, detalles); 
+                
+                response.sendRedirect("Registro_compras.jsp");
+                break;
+            case "actualizar":
+                idCompra = Integer.parseInt(idCompraStr); // Obtener el ID de compra para actualizar
+                
+                Compras compraExistente = comprasDAO.obtenerCompraPorId(idCompra); 
+                
+                if (compraExistente != null) {
+                    nuevaCompra = new Compras(idCompra, compraExistente.getNo_orden_compra(), idProveedor, fechaOrden, fechaIngreso);
+                    
+                    List<DetalleCompra> detallesActualizados = obtenerDetallesDesdeFormulario(request); 
+                    
+                    comprasDAO.actualizarCompraYDetalles(nuevaCompra, detallesActualizados); 
+                    
+                    response.sendRedirect("Registro_compras.jsp");
+                } else {
+                    response.getWriter().println("<h1>No se encontró la compra</h1>");
+                    request.getRequestDispatcher("Registro_compras.jsp").forward(request, response);
+                }
+                break;
+            case "eliminar":
+                idCompra = Integer.parseInt(idCompraStr); 
+                
+                if (comprasDAO.eliminarCompraYDetalles(idCompra)) { 
+                    response.sendRedirect("Registro_compras.jsp");
+                } else {
+                    response.getWriter().println("<h1>No se pudo eliminar la compra</h1>");
+                    request.getRequestDispatcher("Registro_compras.jsp").forward(request, response);
+                }
+                
+                break;
+
+            default:
+                response.sendRedirect("Registro_compras.jsp");
+                break;
+        }
+
+    } catch (NumberFormatException e) { 
+        response.sendRedirect("Registro_compras.jsp"); 
+    }
 }
 
     private void handleProveedores(HttpServletRequest request, HttpServletResponse response)
@@ -169,24 +190,21 @@ private void handleNuevaCompra(HttpServletRequest request, HttpServletResponse r
         return "Short description";
     }
 
-    private List<DetalleCompra> obtenerDetallesDesdeFormulario(HttpServletRequest request) {
+private List<DetalleCompra> obtenerDetallesDesdeFormulario(HttpServletRequest request) {
     List<DetalleCompra> detalles = new ArrayList<>();
     
-    String[] idsProductos = request.getParameterValues("id_producto[]"); // IDs de productos
-    String[] cantidades = request.getParameterValues("cantidad[]"); 
-    String[] preciosUnitarios = request.getParameterValues("precio_costo_unitario[]");
+    String[] idProductos = request.getParameterValues("id_producto[]"); // Asegúrate de que este nombre coincida con el input en el JSP
+    String[] cantidades = request.getParameterValues("cantidad[]"); // Asegúrate de que este nombre coincida con el input en el JSP
+    String[] precios = request.getParameterValues("precio_costo_unitario[]"); // Asegúrate de que este nombre coincida con el input en el JSP
 
-    if (idsProductos != null && cantidades != null && preciosUnitarios != null) {
-        for (int i = 0; i < idsProductos.length; i++) {
-            DetalleCompra detalle = new DetalleCompra();
-            detalle.setId_producto(Integer.parseInt(idsProductos[i])); // Establecer ID del producto
-            detalle.setCantidad(Integer.parseInt(cantidades[i])); // Establecer cantidad
-            detalle.setPrecio_costo_unitario(Double.parseDouble(preciosUnitarios[i])); // Establecer precio unitario
-            
-            detalles.add(detalle); // Agregar a la lista
-        }
+    for (int i = 0; i < idProductos.length; i++) {
+        DetalleCompra detalle = new DetalleCompra();
+        detalle.setId_producto(Integer.parseInt(idProductos[i]));
+        detalle.setCantidad(Integer.parseInt(cantidades[i]));
+        detalle.setPrecio_costo_unitario(Double.parseDouble(precios[i]));
+        detalles.add(detalle);
     }
     
-    return detalles; // Devolver la lista de detalles
+    return detalles;
 }
 }
